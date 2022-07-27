@@ -3,9 +3,12 @@
     "name": "native-voe",
     "slug": "native-voe",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "androidNavigationBar": {
+      "visible": "immersive"
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
