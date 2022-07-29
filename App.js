@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Start from "./screens/Start";
 import Problem from "./screens/Problem";
 import Suggestison from "./screens/Suggestion";
+import Feedback from "./screens/Feedback";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +18,7 @@ export default function App() {
           component={Start}
           options={{
             headerTitle: "СИСТЕМА ЗА ОБРАТНА ВРЪЗКА",
+            headerTitleAlign: "center",
             headerStyle: {
               backgroundColor: "#1b1461",
             },
@@ -39,6 +41,13 @@ export default function App() {
           component={Suggestison}
           options={{
             headerTitle: "Предложение",
+          }}
+        />
+        <Stack.Screen
+          name="Feedback"
+          component={Feedback}
+          options={{
+            headerTitle: "Провери обратната връзка",
           }}
         />
       </Stack.Navigator>
