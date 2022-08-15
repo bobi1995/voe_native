@@ -1,52 +1,59 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
 
 const Start = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.subContainer}>
-        <Image
-          style={styles.announcerImg}
-          source={require("../images/announcer_sized.png")}
-        />
-      </View>
-      <View style={styles.subContainer}>
-        <Image
-          style={styles.announcerImg}
-          source={require("../images/tinywow_remove_bg_3811817.png")}
-        />
-      </View>
-      <View style={styles.subContainer}>
         <TouchableOpacity
           onPress={() => navigation.navigate("Problem")}
-          style={styles.touchableStyle}
+          style={[styles.touchableStyle, { backgroundColor: "#EB1C24" }]}
         >
-          <Image
-            style={styles.btnImg}
-            source={require("../images/alarm.png")}
+          <AntDesign
+            name="exclamationcircleo"
+            size={35}
+            color="white"
+            style={{ marginHorizontal: 15 }}
           />
-          <Text style={styles.textStyle}>Проблем</Text>
+
+          <Text style={styles.textStyle}>Подай сигнал за проблем</Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("Suggestion")}
-          style={styles.touchableStyle}
+          style={[styles.touchableStyle, { backgroundColor: "#62DF90" }]}
         >
-          <Image
-            style={styles.btnImg}
-            source={require("../images/idea2.png")}
+          <AntDesign
+            name="checkcircleo"
+            size={35}
+            color="white"
+            style={{ marginHorizontal: 15 }}
           />
-          <Text style={styles.textStyle}>Предложение</Text>
+
+          <Text style={styles.textStyle}>
+            Изпрати предложение за подобрение
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Feedback")}
-          style={styles.touchableStyle}
+          onPress={() => navigation.navigate("Suggestion")}
+          style={{ marginTop: 25 }}
         >
-          <Image
-            style={styles.btnImg}
-            source={require("../images/button_3.png")}
-          />
-          <Text style={styles.textStyle}>Виж мнение</Text>
+          <Text
+            style={{
+              fontSize: 19,
+              color: "gray",
+            }}
+          >
+            Влез в профила си{" "}
+            <AntDesign name="arrowright" size={19} color="gray" />
+          </Text>
         </TouchableOpacity>
+      </View>
+      <View style={styles.subContainer}>
+        <Image
+          style={styles.announcerImg}
+          source={require("../images/Illustration-Red.png")}
+        />
       </View>
     </View>
   );
@@ -55,14 +62,13 @@ const Start = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#496cb2",
+    backgroundColor: "#F0F0F0",
     alignItems: "center",
     justifyContent: "space-around",
     flexDirection: "row",
   },
   subContainer: {
-    height: "100%",
-    width: "50%",
+    width: 550,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -70,14 +76,13 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    borderColor: "white",
-    borderWidth: 3,
     width: "65%",
-    marginRight: 10,
     marginBottom: 10,
+    borderRadius: 5,
+    height: 70,
   },
   announcerImg: {
-    height: "75%",
+    height: "65%",
     width: "50%",
   },
   btnImg: {
@@ -85,8 +90,9 @@ const styles = StyleSheet.create({
     height: 70,
   },
   textStyle: {
-    fontSize: 23,
+    fontSize: 19,
     color: "white",
+    flexShrink: 1,
   },
 });
 

@@ -20,7 +20,7 @@ export default function App() {
             headerTitle: "СИСТЕМА ЗА ОБРАТНА ВРЪЗКА",
             headerTitleAlign: "center",
             headerStyle: {
-              backgroundColor: "#1b1461",
+              backgroundColor: "#5A607A",
             },
             headerTintColor: "#fff",
             headerTitleStyle: {
