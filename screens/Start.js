@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-
 const Start = ({ navigation }) => {
   return (
     <View style={styles.container}>
@@ -16,7 +15,16 @@ const Start = ({ navigation }) => {
             style={{ marginHorizontal: 15 }}
           />
 
-          <Text style={styles.textStyle}>Подай сигнал за проблем</Text>
+          <Text
+            style={{
+              fontFamily: "mulish",
+              color: "white",
+              fontSize: 18,
+              flexShrink: 1,
+            }}
+          >
+            Подай сигнал за проблем
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => navigation.navigate("Suggestion")}
@@ -29,23 +37,32 @@ const Start = ({ navigation }) => {
             style={{ marginHorizontal: 15 }}
           />
 
-          <Text style={styles.textStyle}>
+          <Text
+            style={{
+              fontFamily: "mulish",
+              color: "white",
+              fontSize: 18,
+              flexShrink: 1,
+            }}
+          >
             Изпрати предложение за подобрение
           </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Suggestion")}
-          style={{ marginTop: 25 }}
+          onPress={() => navigation.navigate("Login")}
+          style={{ marginTop: 36 }}
         >
           <Text
             style={{
-              fontSize: 19,
-              color: "gray",
+              fontFamily: "mulish",
+              color: "#3D4461",
+              fontSize: 18,
+              flexShrink: 1,
             }}
           >
-            Влез в профила си{" "}
-            <AntDesign name="arrowright" size={19} color="gray" />
+            Влез в профила си
+            <AntDesign name="arrowright" size={18} color="#3D4461" />
           </Text>
         </TouchableOpacity>
       </View>
@@ -82,12 +99,12 @@ const styles = StyleSheet.create({
     height: 70,
   },
   announcerImg: {
-    height: "65%",
-    width: "50%",
+    height: 300,
+    width: 350,
   },
   btnImg: {
-    width: 80,
-    height: 70,
+    width: 540,
+    height: 104,
   },
   textStyle: {
     fontSize: 19,
