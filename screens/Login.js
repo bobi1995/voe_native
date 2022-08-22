@@ -6,11 +6,13 @@ import {
   TouchableOpacity,
   TextInput,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
+import * as SecureStore from "expo-secure-store";
 
 const LOGIN_QUERY = gql`
   query ExampleQuery($username: String, $password: String) {
@@ -21,17 +23,21 @@ const LOGIN_QUERY = gql`
     }
   }
 `;
+const saveData = async (key, value) => {
+  await SecureStore.setItemAsync(key, value);
+};
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [getLogin, { loading, error, data }] = useLazyQuery(LOGIN_QUERY, {
     onError: (e) => Alert.alert(e.message),
+    onCompleted: (result) => {
+      saveData("token", result.login.token);
+      saveData("userId", result.login.userId);
+      navigation.navigate("EmpBoard");
+    },
   });
-
-  if (data) {
-    console.log(data);
-  }
 
   return (
     <View style={styles.container}>
@@ -97,33 +103,36 @@ const Login = ({ navigation }) => {
             style={{ marginRight: 10 }}
           />
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            getLogin({
-              variables: {
-                username,
-                password,
-              },
-            });
-          }}
-          style={[
-            styles.touchableStyle,
-            { backgroundColor: "#EB1C24", justifyContent: "center" },
-          ]}
-        >
-          <Text
-            style={{
-              fontFamily: "mulish",
-              color: "white",
-              fontSize: 18,
-              flexShrink: 1,
-              textAlign: "center",
+        {loading ? (
+          <ActivityIndicator size="large" color="#EB1C24" />
+        ) : (
+          <TouchableOpacity
+            onPress={() => {
+              getLogin({
+                variables: {
+                  username,
+                  password,
+                },
+              });
             }}
+            style={[
+              styles.touchableStyle,
+              { backgroundColor: "#EB1C24", justifyContent: "center" },
+            ]}
           >
-            Влез
-          </Text>
-        </TouchableOpacity>
-
+            <Text
+              style={{
+                fontFamily: "mulish",
+                color: "white",
+                fontSize: 18,
+                flexShrink: 1,
+                textAlign: "center",
+              }}
+            >
+              Влез
+            </Text>
+          </TouchableOpacity>
+        )}
         <TouchableOpacity
           onPress={() => navigation.navigate("Start")}
           style={{ marginTop: 36 }}

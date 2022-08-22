@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Start from "./screens/Start";
 import SendCase from "./screens/SendCase";
 import Login from "./screens/Login";
+import EmpBoard from "./screens/EmpBoard";
 import React, { useCallback, useEffect } from "react";
 import { useFonts } from "@expo-google-fonts/mulish";
 import * as SplashScreen from "expo-splash-screen";
@@ -91,6 +92,13 @@ export default function App() {
           <Stack.Screen
             name="Login"
             component={Login}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="EmpBoard"
+            component={EmpBoard}
             options={{
               headerShown: false,
             }}

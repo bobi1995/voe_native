@@ -222,12 +222,7 @@ const SendCase = ({ navigation, route }) => {
               </View>
               <View style={{ width: "45%" }}>
                 <Text style={styles.label}>Име и Фамилия</Text>
-                <TextInput
-                  style={styles.input}
-                  // onChangeText={onChangeNumber}
-                  value={name}
-                  placeholder=""
-                />
+                <TextInput style={styles.input} value={name} placeholder="" />
               </View>
             </SafeAreaView>
             <SafeAreaView style={{ marginTop: 10 }}>
