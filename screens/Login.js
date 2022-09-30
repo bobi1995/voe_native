@@ -7,12 +7,14 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import * as SecureStore from "expo-secure-store";
+const { width, height } = Dimensions.get("window");
 
 const LOGIN_QUERY = gql`
   query ExampleQuery($username: String, $password: String) {
@@ -35,23 +37,58 @@ const Login = ({ navigation }) => {
     onCompleted: (result) => {
       saveData("token", result.login.token);
       saveData("userId", result.login.userId);
-      navigation.navigate("EmpBoard");
+      navigation.navigate("EmpBoard", {
+        userId: result.login.userId,
+        token: result.login.token,
+      });
     },
   });
 
   return (
     <View style={styles.container}>
-      <View style={styles.subContainer}>
+      <View style={[styles.subContainer, { width: "50%" }]}>
+        <View
+          style={{
+            padding: 10,
+            alignItems: "center",
+            width: width * 0.3,
+            marginBottom: height * 0.05,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: height * 0.05,
+              fontWeight: "bold",
+              color: "#3D4461",
+              fontFamily: "mulish",
+              opacity: 1,
+              textAlign: "center",
+            }}
+          >
+            Система за обратна връзка
+          </Text>
+          <Text
+            style={{
+              fontSize: height * 0.035,
+              color: "#231F20",
+              fontFamily: "mulish",
+              opacity: 1,
+              textAlign: "center",
+            }}
+          >
+            Моля, влез в профила си
+          </Text>
+        </View>
         <View
           style={{
             flexDirection: "row",
-            height: 40,
             borderWidth: 1,
             borderRadius: 5,
             borderColor: "#AAAEBF",
-            width: "60%",
             alignItems: "center",
             marginBottom: 10,
+            height: height * 0.1,
+            width: width * 0.4,
           }}
         >
           <TextInput
@@ -59,6 +96,7 @@ const Login = ({ navigation }) => {
               width: "100%",
               flex: 1,
               paddingLeft: 10,
+              fontSize: height * 0.05,
             }}
             onChangeText={setUsername}
             value={username}
@@ -75,13 +113,13 @@ const Login = ({ navigation }) => {
         <View
           style={{
             flexDirection: "row",
-            height: 40,
             borderWidth: 1,
             borderRadius: 5,
             borderColor: "#AAAEBF",
-            width: "60%",
             alignItems: "center",
             marginBottom: 10,
+            height: height * 0.1,
+            width: width * 0.4,
           }}
         >
           <TextInput
@@ -89,6 +127,7 @@ const Login = ({ navigation }) => {
               width: "100%",
               flex: 1,
               paddingLeft: 10,
+              fontSize: height * 0.05,
             }}
             onChangeText={setPassword}
             value={password}
@@ -124,9 +163,8 @@ const Login = ({ navigation }) => {
               style={{
                 fontFamily: "mulish",
                 color: "white",
-                fontSize: 18,
+                fontSize: height * 0.05,
                 flexShrink: 1,
-                textAlign: "center",
               }}
             >
               Влез
@@ -141,16 +179,16 @@ const Login = ({ navigation }) => {
             style={{
               fontFamily: "mulish",
               color: "#3D4461",
-              fontSize: 18,
+              fontSize: height * 0.04,
               flexShrink: 1,
             }}
           >
-            <AntDesign name="arrowleft" size={18} color="#3D4461" />
+            <AntDesign name="arrowleft" size={height * 0.04} color="#3D4461" />
             Върни се обратно
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.subContainer}>
+      <View style={[styles.subContainer, { width: "50%" }]}>
         <Image
           style={styles.announcerImg}
           source={require("../images/Illustration-Red.png")}
@@ -177,14 +215,15 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    width: "60%",
+    width: width * 0.4,
     marginBottom: 10,
     borderRadius: 5,
-    height: 40,
+    height: height * 0.1,
   },
   announcerImg: {
-    height: 300,
-    width: 350,
+    flex: 1,
+    width: 650,
+    resizeMode: "contain",
   },
   btnImg: {
     width: 540,
@@ -196,12 +235,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   input: {
-    height: 40,
+    height: height * 0.1,
+    width: width * 0.4,
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
     borderColor: "#AAAEBF",
-    width: "60%",
   },
 });
 

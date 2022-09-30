@@ -5,19 +5,22 @@ import Start from "./screens/Start";
 import SendCase from "./screens/SendCase";
 import Login from "./screens/Login";
 import EmpBoard from "./screens/EmpBoard";
+import IndividualCase from "./screens/IndividualCase";
 import React, { useCallback, useEffect } from "react";
 import { useFonts } from "@expo-google-fonts/mulish";
 import * as SplashScreen from "expo-splash-screen";
 import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import { createUploadLink } from "apollo-upload-client";
-import * as ScreenOrientation from "expo-screen-orientation";
+import { Dimensions } from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 const Stack = createNativeStackNavigator();
 
 // Initialize Apollo Client
 const client = new ApolloClient({
   link: createUploadLink({
-    uri: "http://192.168.55.93:3001/graphql",
+    uri: "http://192.168.1.152:3001/graphql",
     headers: {
       "apollo-require-preflight": true,
       "Content-Type": "application/json",
@@ -41,12 +44,6 @@ export default function App() {
     return null;
   }
 
-  async function changeScreenOrientation() {
-    await ScreenOrientation.lockAsync(
-      ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
-    );
-  }
-
   return (
     <ApolloProvider client={client}>
       <NavigationContainer onLayout={onLayoutRootView}>
@@ -63,9 +60,10 @@ export default function App() {
               },
               headerTintColor: "#fff",
               headerTitleStyle: {
-                fontSize: 25,
+                fontSize: height * 0.07,
                 fontFamily: "mulish",
               },
+              headerShown: false,
             }}
           />
           <Stack.Screen
@@ -99,6 +97,13 @@ export default function App() {
           <Stack.Screen
             name="EmpBoard"
             component={EmpBoard}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="IndividualCase"
+            component={IndividualCase}
             options={{
               headerShown: false,
             }}

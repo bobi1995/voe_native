@@ -8,6 +8,9 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  Dimensions,
+  KeyboardAvoidingView,
+  Button,
 } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
 import { Octicons } from "@expo/vector-icons";
@@ -16,6 +19,7 @@ import { useState, useEffect } from "react";
 import Checkbox from "expo-checkbox";
 import ConfirmModal from "../components/Problem/ConfirmModal";
 import HelpModal from "../components/Problem/HelpModal";
+const { width, height } = Dimensions.get("window");
 
 const GET_CATEGORIES = gql`
   query ExampleQuery {
@@ -108,7 +112,7 @@ const SendCase = ({ navigation, route }) => {
           >
             <Text
               style={{
-                fontSize: 21,
+                fontSize: height * 0.05,
                 fontWeight: "bold",
                 color: "#3D4461",
                 fontFamily: "mulish",
@@ -119,7 +123,7 @@ const SendCase = ({ navigation, route }) => {
             </Text>
             <Text
               style={{
-                fontSize: 15,
+                fontSize: height * 0.035,
                 color: "#231F20",
                 fontFamily: "mulish",
                 opacity: 1,
@@ -135,7 +139,7 @@ const SendCase = ({ navigation, route }) => {
             >
               <AntDesign
                 name="arrowleft"
-                size={19}
+                size={height * 0.04}
                 color="white"
                 style={{ marginRight: 5 }}
               />
@@ -147,7 +151,7 @@ const SendCase = ({ navigation, route }) => {
             >
               <AntDesign
                 name="questioncircleo"
-                size={19}
+                size={height * 0.04}
                 color="white"
                 style={{ marginRight: 5 }}
               />
@@ -162,7 +166,7 @@ const SendCase = ({ navigation, route }) => {
               <Text style={styles.btnText}>Напред</Text>
               <AntDesign
                 name="arrowright"
-                size={19}
+                size={height * 0.04}
                 color="white"
                 style={{ marginLeft: 5 }}
               />
@@ -171,18 +175,37 @@ const SendCase = ({ navigation, route }) => {
         </View>
         <View style={styles.headerContainer}>
           <View style={styles.innerBodyContainer}>
+            <SafeAreaView>
+              <Text style={styles.label}>Описание на проблема</Text>
+
+              <TextInput
+                multiline={true}
+                style={{
+                  width: "99%",
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: "#AAAEBF",
+                  height: height * 0.4,
+                  textAlignVertical: "top",
+                  fontSize: height * 0.05,
+                }}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Опиши възникналият проблем..."
+              />
+            </SafeAreaView>
             <SafeAreaView
               style={{
                 flexDirection: "row",
                 justifyContent: "space-between",
               }}
             >
-              <View style={{ width: "45%" }}>
+              <View style={{ width: "35%" }}>
                 <Text style={styles.label}>Потребител</Text>
                 <View
                   style={{
                     flexDirection: "row",
-                    height: 40,
+                    height: height * 0.1,
                     borderWidth: 1,
                     borderRadius: 5,
                     borderColor: "#AAAEBF",
@@ -192,6 +215,7 @@ const SendCase = ({ navigation, route }) => {
                   <Text
                     style={{
                       color: "black",
+                      fontSize: height * 0.05,
                     }}
                   >
                     emp
@@ -203,6 +227,7 @@ const SendCase = ({ navigation, route }) => {
                     style={{
                       width: "100%",
                       flex: 1,
+                      fontSize: height * 0.05,
                     }}
                     onChangeText={(value) => {
                       if (value.length === 3) {
@@ -220,27 +245,10 @@ const SendCase = ({ navigation, route }) => {
                   />
                 </View>
               </View>
-              <View style={{ width: "45%" }}>
+              <View style={{ width: "60%" }}>
                 <Text style={styles.label}>Име и Фамилия</Text>
                 <TextInput style={styles.input} value={name} placeholder="" />
               </View>
-            </SafeAreaView>
-            <SafeAreaView style={{ marginTop: 10 }}>
-              <Text style={styles.label}>Описание на проблема</Text>
-              <TextInput
-                multiline={true}
-                style={{
-                  width: "99%",
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: "#AAAEBF",
-                  height: 100,
-                  textAlignVertical: "top",
-                }}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Опиши възникналият проблем..."
-              />
             </SafeAreaView>
           </View>
           <View style={styles.innerBodyContainer}>
@@ -259,7 +267,11 @@ const SendCase = ({ navigation, route }) => {
                     value={isChecked === 1}
                     onValueChange={() => setChecked(1)}
                   />
-                  <Octicons name="dot-fill" size={30} color="#62DF90" />
+                  <Octicons
+                    name="dot-fill"
+                    size={height * 0.05}
+                    color="#62DF90"
+                  />
                   <Text style={styles.paragraph}>Нисък</Text>
                 </View>
                 <View style={styles.section}>
@@ -268,7 +280,11 @@ const SendCase = ({ navigation, route }) => {
                     value={isChecked === 2}
                     onValueChange={() => setChecked(2)}
                   />
-                  <Octicons name="dot-fill" size={30} color="#F6C274" />
+                  <Octicons
+                    name="dot-fill"
+                    size={height * 0.05}
+                    color="#F6C274"
+                  />
                   <Text style={styles.paragraph}>Среден</Text>
                 </View>
                 <View style={styles.section}>
@@ -277,12 +293,24 @@ const SendCase = ({ navigation, route }) => {
                     value={isChecked === 3}
                     onValueChange={() => setChecked(3)}
                   />
-                  <Octicons name="dot-fill" size={30} color="#EB1C24" />
+                  <Octicons
+                    name="dot-fill"
+                    size={height * 0.05}
+                    color="#EB1C24"
+                  />
                   <Text style={styles.paragraph}>Висок</Text>
                 </View>
               </SafeAreaView>
             </View>
-            <View style={[styles.horizontal, { justifyContent: "flex-start" }]}>
+            <View
+              style={[
+                styles.horizontal,
+                {
+                  justifyContent: "flex-start",
+                  flexWrap: "wrap",
+                },
+              ]}
+            >
               {data && data.getAllCategories
                 ? data.getAllCategories.map((el) => (
                     <TouchableOpacity
@@ -310,8 +338,8 @@ const SendCase = ({ navigation, route }) => {
                       <Text
                         style={
                           categories.includes(el._id)
-                            ? [styles.paragraph, { color: "#FFFFFF" }]
-                            : styles.paragraph
+                            ? [styles.categoryText, { color: "#FFFFFF" }]
+                            : styles.categoryText
                         }
                       >
                         {el.name}
@@ -358,7 +386,6 @@ const SendCase = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     backgroundColor: "#F4F4F4",
   },
   horizontal: {
@@ -378,9 +405,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     flexDirection: "row",
     alignItems: "center",
-    height: 50,
+    height: height * 0.12,
     borderRadius: 5,
     marginHorizontal: 3,
+    width: width * 0.17,
   },
   picBtn: {
     backgroundColor: "#AAAEBF",
@@ -393,7 +421,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: "white",
-    fontSize: 19,
+    fontSize: height * 0.05,
     fontFamily: "mulish",
   },
   innerBodyContainer: {
@@ -402,16 +430,19 @@ const styles = StyleSheet.create({
     elevation: 10,
     borderRadius: 5,
     padding: 15,
+    marginTop: height * 0.05,
   },
   input: {
-    height: 40,
+    height: height * 0.05,
     borderWidth: 1,
     padding: 10,
     borderRadius: 5,
     borderColor: "#AAAEBF",
+    fontSize: height * 0.05,
+    flex: 1,
   },
   label: {
-    fontSize: 15,
+    fontSize: height * 0.04,
     fontWeight: "bold",
     color: "#3D4461",
     fontFamily: "mulish",
@@ -428,16 +459,25 @@ const styles = StyleSheet.create({
     borderColor: "#AAAEBF",
     borderRadius: 5,
     marginRight: 5,
+    marginBottom: 5,
     padding: 5,
   },
   paragraph: {
-    fontSize: 15,
+    fontSize: height * 0.045,
+    fontFamily: "mulish",
+    marginLeft: 5,
+    color: "#3D4461",
+  },
+  categoryText: {
+    fontSize: width * 0.02,
     fontFamily: "mulish",
     marginLeft: 5,
     color: "#3D4461",
   },
   checkbox: {
     margin: 8,
+    height: width * 0.03,
+    width: width * 0.03,
   },
 });
 

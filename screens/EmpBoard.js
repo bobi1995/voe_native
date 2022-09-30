@@ -8,33 +8,43 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  Dimensions,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
 import { Octicons } from "@expo/vector-icons";
 import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import * as SecureStore from "expo-secure-store";
-import {
-  Table,
-  TableWrapper,
-  Row,
-  Cell,
-  Rows,
-} from "react-native-table-component";
+import { Table, TableWrapper, Row, Cell } from "react-native-table-component";
+import UserAvatar from "react-native-user-avatar";
+import { AirbnbRating } from "react-native-ratings";
+import { AntDesign } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+
+const { width, height } = Dimensions.get("window");
 
 const GET_USER = gql`
   query ExampleQuery($getSingleUserId: String!) {
     getSingleUser(id: $getSingleUserId) {
       _id
       username
+      name
       regCaseIds {
+        _id
         date
         priority
         type
         description
         status
+        rating
         categoryId {
           name
+        }
+        answerId {
+          _id
+          approved {
+            _id
+          }
         }
       }
     }
@@ -59,15 +69,17 @@ const priorityElement = (priority) => {
         flexDirection: "row",
         alignItems: "center",
         padding: 3,
+        paddingHorizontal: 10,
       }}
     >
-      <Octicons name="dot-fill" size={30} color={params.color} />
+      <Octicons name="dot-fill" size={height * 0.035} color={params.color} />
       <Text
         style={{
           fontSize: 15,
           fontFamily: "mulish",
           marginLeft: 5,
-          color: "#3D4461",
+          color: "#5A607A",
+          fontSize: height * 0.02,
         }}
       >
         {params.text}
@@ -76,48 +88,97 @@ const priorityElement = (priority) => {
   );
 };
 
-const EmpBoard = ({ navigation }) => {
-  const [token, setToken] = useState("");
-  const [userId, setUserId] = useState("");
+const OpenElement = (navigation, userId, token, caseId) => {
+  return (
+    <AntDesign
+      name="folderopen"
+      size={height * 0.04}
+      color="#5A607A"
+      style={{ alignSelf: "center" }}
+      onPress={() =>
+        navigation.navigate("IndividualCase", {
+          userId,
+          token,
+          caseId,
+        })
+      }
+    />
+  );
+};
+const EmpBoard = ({ navigation, route }) => {
+  const { userId, token } = route.params;
   const [tableData, setTableData] = useState([]);
-
-  const [getUser, { loading: loadUser, error: errorUser, data: userData }] =
-    useLazyQuery(GET_USER, {
-      onCompleted: (data) => {
-        const tempData = data.getSingleUser.regCaseIds.map((el) => {
-          const categories = el.categoryId.map((cat) => cat.name);
-          return {
-            priority: el.priority,
-            type: el.type === 1 ? "Проблем" : "Предложение",
-            categories: categories.join(","),
-            description: el.description,
-            status: el.status === 0 ? "Отворен" : "Разрешен",
-            date: el.date,
-          };
-        });
-        tempData.sort((a, b) => a.date < b.date);
-        setTableData(tempData);
-      },
-    });
+  const [renderTableData, setRenderTableData] = useState([]);
+  const [favCategory, setFavCategory] = useState(null);
+  const [answers, setAnswers] = useState(0);
+  const [empRate, setEmpRate] = useState(null);
+  const {
+    loading: loadUser,
+    error: errorUser,
+    data: userData,
+  } = useQuery(GET_USER, {
+    variables: {
+      getSingleUserId: userId,
+    },
+  });
 
   useEffect(() => {
-    getValue("token")
-      .then((data) => setToken(data))
-      .catch((err) => console.log(err));
-
-    getValue("userId")
-      .then((data) => {
-        if (data) {
-          getUser({
-            variables: {
-              getSingleUserId: data,
-            },
+    if (userData) {
+      let votes = 0;
+      let rating = 0;
+      const tempData = userData.getSingleUser.regCaseIds.map((el) => {
+        if (el.rating && el.rating.length > 0) {
+          el.rating.map((vote) => {
+            const toObject = JSON.parse(vote);
+            votes++;
+            return (rating = rating + toObject.rating);
           });
         }
-        setUserId(data);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+
+        const categories = el.categoryId.map((cat) => cat.name);
+        if (el.answerId.length > 0) {
+          el.answerId.map((ans) =>
+            ans.approved ? setAnswers(answers + 1) : null
+          );
+        }
+
+        return {
+          priority: el.priority,
+          type: el.type === 1 ? "Проблем" : "Предложение",
+          categories: categories.join(","),
+          description: el.description,
+          status: el.status === 0 ? "Отворен" : "Разрешен",
+          date: el.date,
+          _id: el._id,
+        };
+      });
+
+      setEmpRate(rating / votes);
+      tempData.sort((a, b) => a.date < b.date);
+
+      //Favourite category
+      const cat = tempData
+        .map((el) => el.categories)
+        .toString()
+        .split(",");
+      const most = cat.reduce(
+        (a, b, i, arr) =>
+          arr.filter((v) => v === a).length >= arr.filter((v) => v === b).length
+            ? a
+            : b,
+        null
+      );
+      setFavCategory(most);
+
+      setTableData(tempData);
+      setRenderTableData(tempData);
+    }
+  }, [userData]);
+
+  if (errorUser) {
+    console.log(errorUser);
+    return Alert.alert(errorUser.message);
+  }
 
   if (loadUser)
     return (
@@ -126,8 +187,19 @@ const EmpBoard = ({ navigation }) => {
       </View>
     );
 
-  const tableHead = ["Приоритет", "Тип", "Категория", "Описание", "Статус"];
-
+  const tableHead = [
+    "Приоритет",
+    "Тип",
+    "Категория",
+    "Описание",
+    "Статус",
+    <Ionicons
+      name="menu"
+      size={height * 0.05}
+      color="white"
+      style={{ alignSelf: "center" }}
+    />,
+  ];
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
@@ -138,18 +210,19 @@ const EmpBoard = ({ navigation }) => {
         >
           <Text
             style={{
-              fontSize: 21,
+              fontSize: height * 0.05,
               fontWeight: "bold",
               color: "#3D4461",
               fontFamily: "mulish",
               opacity: 1,
+              textAlign: "center",
             }}
           >
             Система за обратна връзка
           </Text>
           <Text
             style={{
-              fontSize: 15,
+              fontSize: height * 0.035,
               color: "#231F20",
               fontFamily: "mulish",
               opacity: 1,
@@ -162,11 +235,11 @@ const EmpBoard = ({ navigation }) => {
           <View
             style={{
               flexDirection: "row",
-              height: 50,
+              height: height * 0.09,
               borderWidth: 1,
               borderRadius: 5,
               borderColor: "#AAAEBF",
-              width: 250,
+              width: width * 0.3,
               alignItems: "center",
             }}
           >
@@ -181,9 +254,17 @@ const EmpBoard = ({ navigation }) => {
                 width: "100%",
                 flex: 1,
                 paddingLeft: 5,
+                fontSize: height * 0.03,
               }}
-              //   onChangeText={setPassword}
-              //   value={password}
+              onChangeText={(value) => {
+                setRenderTableData(tableData);
+                if (value) {
+                  const filtered = tableData.filter((el) =>
+                    el.description.toLowerCase().includes(value.toLowerCase())
+                  );
+                  setRenderTableData(filtered);
+                }
+              }}
               placeholder="Търсене по описание"
               autoCapitalize="none"
             />
@@ -202,31 +283,165 @@ const EmpBoard = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
       {userData && userData.getSingleUser ? (
-        <ScrollView>
-          <View style={styles.tableContainer}>
-            <Table borderStyle={{ borderWidth: 2, borderColor: "#c8e1ff" }}>
-              <Row
-                data={tableHead}
-                style={styles.tableHead}
-                textStyle={styles.tableText}
+        <>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              padding: 16,
+              borderRadius: 5,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                backgroundColor: "white",
+                padding: 10,
+                elevation: 10,
+                width: width * 0.2,
+                borderRadius: 5,
+              }}
+            >
+              <UserAvatar
+                size={height * 0.06}
+                name={userData.getSingleUser.name}
+                style={{
+                  marginRight: 10,
+                }}
               />
-              {/* <Rows data={tableData} textStyle={styles.tableText} /> */}
-              {tableData.map((tableRow, index) => (
-                <TableWrapper key={index} style={styles.row}>
-                  <Cell
-                    data={priorityElement(tableRow.priority)}
-                    textStyle={styles.text}
-                  />
-                  <Cell data={tableRow.type} textStyle={styles.text} />
-                  <Cell data={tableRow.categories} textStyle={styles.text} />
-                  <Cell data={tableRow.description} textStyle={styles.text} />
-                  <Cell data={tableRow.status} textStyle={styles.text} />
-                </TableWrapper>
-              ))}
-            </Table>
+              <View>
+                <Text style={styles.smallInfoHeading}>
+                  {userData.getSingleUser.username}
+                </Text>
+                <Text style={styles.smallInfoText}>
+                  {userData.getSingleUser.name}
+                </Text>
+              </View>
+            </View>
+            <View style={styles.smallInfoContainer}>
+              <Text style={styles.smallInfoHeading}>
+                Рейтинг - {empRate ? empRate.toFixed(2) : "N/A"}
+              </Text>
+              <AirbnbRating
+                count={5}
+                reviews={[
+                  "Слаб",
+                  "Незадоволително",
+                  "Средно",
+                  "Добре",
+                  "Страхотен",
+                ]}
+                defaultRating={Math.round(empRate)}
+                size={height * 0.025}
+                reviewSize={height * 0.025}
+                showRating={false}
+                //selectedColor="#3D4461"
+                starContainerStyle={{
+                  alignSelf: "flex-start",
+                }}
+              />
+            </View>
+            <View style={styles.smallInfoContainer}>
+              <Text style={styles.smallInfoHeading}>Отговори/Сигнали</Text>
+              <Text style={styles.smallInfoText}>
+                {answers}/{userData.getSingleUser.regCaseIds.length}
+              </Text>
+            </View>
+            <View style={styles.smallInfoContainer}>
+              <Text style={styles.smallInfoHeading}>Любима категория</Text>
+              <Text style={styles.smallInfoText}>{favCategory}</Text>
+            </View>
           </View>
-        </ScrollView>
+          <ScrollView>
+            <View style={styles.tableContainer}>
+              <Table
+                borderStyle={{
+                  borderWidth: 2,
+                  borderColor: "white",
+                  borderRadius: 5,
+                }}
+              >
+                <Row
+                  data={tableHead}
+                  style={styles.tableHead}
+                  textStyle={{
+                    color: "white",
+                    fontWeight: "bold",
+                    fontSize: height * 0.02,
+                    paddingHorizontal: 10,
+                    // alignSelf: "center",
+                  }}
+                  widthArr={[220, 220, 220, 220, 220, 150]}
+                />
+                {renderTableData.map((tableRow, index) => (
+                  <TableWrapper
+                    key={index}
+                    style={
+                      index % 2 !== 0
+                        ? styles.row
+                        : {
+                            backgroundColor: "#EDEEF2",
+                            flexDirection: "row",
+                            backgroundColor: "white",
+                          }
+                    }
+                  >
+                    <Cell
+                      data={priorityElement(tableRow.priority)}
+                      textStyle={styles.rowText}
+                      numberOfLines={1}
+                      width={220}
+                    />
+                    <Cell
+                      data={tableRow.type}
+                      textStyle={styles.rowText}
+                      numberOfLines={1}
+                      width={220}
+                    />
+                    <Cell
+                      data={tableRow.categories}
+                      textStyle={styles.rowText}
+                      numberOfLines={1}
+                      width={220}
+                    />
+                    <Cell
+                      data={tableRow.description}
+                      textStyle={styles.rowText}
+                      numberOfLines={1}
+                      width={220}
+                    />
+                    <Cell
+                      data={tableRow.status}
+                      textStyle={styles.rowText}
+                      numberOfLines={1}
+                      width={220}
+                    />
+                    <Cell
+                      data={OpenElement(
+                        navigation,
+                        userId,
+                        token,
+                        tableRow._id
+                      )}
+                      textStyle={{
+                        justifyContent: "center",
+                        color: "#5A607A",
+                        fontFamily: "mulish",
+                        overflow: "hidden",
+                        paddingHorizontal: 10,
+                        fontSize: height * 0.02,
+                      }}
+                      numberOfLines={1}
+                      width={150}
+                    />
+                  </TableWrapper>
+                ))}
+              </Table>
+            </View>
+          </ScrollView>
+        </>
       ) : (
         <Text>Няма данни за потребителя!</Text>
       )}
@@ -256,13 +471,14 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     flexDirection: "row",
     alignItems: "center",
-    height: 50,
+    height: height * 0.09,
     borderRadius: 5,
     marginHorizontal: 3,
+    width: width * 0.1,
   },
   btnText: {
     color: "white",
-    fontSize: 19,
+    fontSize: height * 0.035,
     fontFamily: "mulish",
   },
   input: {
@@ -278,11 +494,38 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     paddingTop: 30,
-    backgroundColor: "#fff",
+    backgroundColor: "#F4F4F4",
+    elevation: 10,
+    borderRadius: 5,
   },
-  tableHead: { height: 40, backgroundColor: "#f1f8ff" },
+  tableHead: { height: 40, backgroundColor: "#5A607A" },
   tableText: { margin: 6 },
-  row: { flexDirection: "row", backgroundColor: "#FFF1C1" },
+  row: { flexDirection: "row", backgroundColor: "white" },
+  rowText: {
+    color: "#5A607A",
+    fontFamily: "mulish",
+    overflow: "hidden",
+    paddingHorizontal: 10,
+    fontSize: height * 0.02,
+  },
+  smallInfoContainer: {
+    backgroundColor: "white",
+    padding: 10,
+    elevation: 10,
+    width: width * 0.2,
+    borderRadius: 5,
+  },
+  smallInfoHeading: {
+    color: "#5A607A",
+    fontFamily: "mulish",
+    fontSize: height * 0.02,
+  },
+  smallInfoText: {
+    color: "#5A607A",
+    fontFamily: "mulish",
+    fontSize: height * 0.02,
+    fontWeight: "bold",
+  },
 });
 
 export default EmpBoard;

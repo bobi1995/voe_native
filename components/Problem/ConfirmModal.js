@@ -10,10 +10,12 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  Dimensions,
 } from "react-native";
 import Signature from "react-native-signature-canvas";
 import { gql, useMutation } from "@apollo/client";
 import { AntDesign } from "@expo/vector-icons";
+const { width, height } = Dimensions.get("window");
 
 const SEND_CASE = gql`
   mutation CreateCase($input: CreateCase!, $attachments: Upload) {
@@ -95,10 +97,9 @@ const ConfirmModal = ({
             style={[
               styles.modalView,
               {
-                padding: 35,
-                justifyContent: "center",
-                height: 300,
-                width: 350,
+                padding: 10,
+                height: height * 0.7,
+                width: width * 0.7,
               },
             ]}
           >
@@ -117,7 +118,12 @@ const ConfirmModal = ({
               style={[
                 styles.button,
                 styles.buttonClose,
-                { backgroundColor: "#EB1C24" },
+                {
+                  backgroundColor: "#EB1C24",
+                  width: width * 0.2,
+                  bottom: 10,
+                  position: "absolute",
+                },
               ]}
               onPress={() => setModalVisible(!modalVisible)}
             >
@@ -142,8 +148,12 @@ const ConfirmModal = ({
       <View style={styles.centeredView}>
         {caseData ? (
           <View style={[styles.modalView, { padding: 20 }]}>
-            <AntDesign name="checkcircleo" size={120} color="#EEEFF2" />
-            <View style={{ paddingHorizontal: 30 }}>
+            <AntDesign
+              name="checkcircleo"
+              size={height * 0.3}
+              color="#EEEFF2"
+            />
+            <View style={{ paddingHorizontal: 30, marginTop: 40 }}>
               <Text style={styles.modalText}>
                 Успешно изпратихте вашето предложение за подобрение
               </Text>
@@ -158,7 +168,12 @@ const ConfirmModal = ({
               style={[
                 styles.button,
                 styles.buttonClose,
-                { backgroundColor: "#EB1C24" },
+                {
+                  backgroundColor: "#EB1C24",
+                  width: width * 0.2,
+                  position: "absolute",
+                  bottom: 10,
+                },
               ]}
               onPress={() => navigate("Start")}
             >
@@ -178,12 +193,12 @@ const ConfirmModal = ({
               Подпишете се с пръст върху оказаното на екрана място
             </Text>
 
-            <View>
+            <View style={{ flex: 1 }}>
               {signature ? (
                 <View style={styles.preview}>
                   <Image
                     resizeMode={"contain"}
-                    style={{ width: 335, height: 114 }}
+                    style={{ flex: 1, width: 650, resizeMode: "contain" }}
                     source={{ uri: signature }}
                   />
 
@@ -210,26 +225,37 @@ const ConfirmModal = ({
                 </View>
               ) : (
                 <View style={styles.preview}>
-                  <Signature ref={ref} onOK={handleOK} webStyle={style} />
+                  <Signature
+                    ref={ref}
+                    onOK={handleOK}
+                    webStyle={style}
+                    style={{ flex: 1 }}
+                  />
 
                   <View style={styles.row}>
                     <TouchableOpacity
                       onPress={() => setModalVisible(!modalVisible)}
                       style={styles.confirmBtn}
                     >
-                      <Text style={{ color: "white" }}>Откажи се</Text>
+                      <Text style={{ color: "white", fontSize: height * 0.04 }}>
+                        Откажи се
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleEmpty()}
                       style={styles.confirmBtn}
                     >
-                      <Text style={{ color: "white" }}>Изчисти</Text>
+                      <Text style={{ color: "white", fontSize: height * 0.04 }}>
+                        Изчисти
+                      </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       onPress={() => handleConfirm()}
                       style={styles.confirmBtn}
                     >
-                      <Text style={{ color: "white" }}>Потвърди</Text>
+                      <Text style={{ color: "white", fontSize: height * 0.04 }}>
+                        Потвърди
+                      </Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -251,7 +277,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginHorizontal: 3,
-    width: 100,
+    width: width * 0.2,
   },
   row: {
     display: "flex",
@@ -262,10 +288,11 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   preview: {
-    width: 500,
-    height: 250,
+    width: width * 0.7,
+    height: height * 0.7,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 15,
   },
   centeredView: {
     flex: 1,
@@ -310,9 +337,10 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+    fontSize: height * 0.04,
   },
   modalText: {
-    fontSize: 19,
+    fontSize: height * 0.04,
     fontFamily: "mulish",
     color: "#3D4461",
     fontWeight: "bold",
@@ -321,17 +349,16 @@ const styles = StyleSheet.create({
   modalSubText: {
     fontFamily: "mulish",
     color: "#3D4461",
-    fontSize: 15,
+    fontSize: height * 0.03,
     textAlign: "center",
   },
 });
+
 const style = `
 .m-signature-pad {
-  width: ${Platform.OS === "android" ? `400px` : `500px`};
-  height:165px;
   border: 1px solid #e8e8e8;
   background-color: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.08) inset;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.27), 0 0 40px rgba(0, 0, 0, 0.08) inset;  
 }
 .m-signature-pad--body {border: none; }
 .m-signature-pad--footer.m-signature-pad--footer

@@ -1,16 +1,57 @@
-import { StyleSheet, Text, View, TouchableOpacity, Image } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+} from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-const Start = ({ navigation }) => {
+const { width, height } = Dimensions.get("window");
+
+const Start = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.subContainer}>
+      <View style={[styles.subContainer, { width: "50%" }]}>
+        <View
+          style={{
+            padding: 10,
+            alignItems: "center",
+            width: width * 0.3,
+            marginBottom: height * 0.05,
+          }}
+        >
+          <Text
+            style={{
+              fontSize: height * 0.05,
+              fontWeight: "bold",
+              color: "#3D4461",
+              fontFamily: "mulish",
+              opacity: 1,
+              textAlign: "center",
+            }}
+          >
+            Система за обратна връзка
+          </Text>
+          <Text
+            style={{
+              fontSize: height * 0.035,
+              color: "#231F20",
+              fontFamily: "mulish",
+              opacity: 1,
+              textAlign: "center",
+            }}
+          >
+            Моля, избери опция
+          </Text>
+        </View>
         <TouchableOpacity
           onPress={() => navigation.navigate("Problem")}
           style={[styles.touchableStyle, { backgroundColor: "#EB1C24" }]}
         >
           <AntDesign
             name="exclamationcircleo"
-            size={35}
+            size={height * 0.07}
             color="white"
             style={{ marginHorizontal: 15 }}
           />
@@ -19,7 +60,7 @@ const Start = ({ navigation }) => {
             style={{
               fontFamily: "mulish",
               color: "white",
-              fontSize: 18,
+              fontSize: height * 0.05,
               flexShrink: 1,
             }}
           >
@@ -32,7 +73,7 @@ const Start = ({ navigation }) => {
         >
           <AntDesign
             name="checkcircleo"
-            size={35}
+            size={height * 0.07}
             color="white"
             style={{ marginHorizontal: 15 }}
           />
@@ -41,7 +82,7 @@ const Start = ({ navigation }) => {
             style={{
               fontFamily: "mulish",
               color: "white",
-              fontSize: 18,
+              fontSize: height * 0.05,
               flexShrink: 1,
             }}
           >
@@ -57,16 +98,16 @@ const Start = ({ navigation }) => {
             style={{
               fontFamily: "mulish",
               color: "#3D4461",
-              fontSize: 18,
+              fontSize: height * 0.04,
               flexShrink: 1,
             }}
           >
             Влез в профила си
-            <AntDesign name="arrowright" size={18} color="#3D4461" />
+            <AntDesign name="arrowright" size={height * 0.04} color="#3D4461" />
           </Text>
         </TouchableOpacity>
       </View>
-      <View style={styles.subContainer}>
+      <View style={[styles.subContainer, { width: "50%" }]}>
         <Image
           style={styles.announcerImg}
           source={require("../images/Illustration-Red.png")}
@@ -93,19 +134,17 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    width: "65%",
+    width: width * 0.45,
     marginBottom: 10,
     borderRadius: 5,
-    height: 70,
+    height: height * 0.15,
   },
   announcerImg: {
-    height: 300,
-    width: 350,
+    flex: 1,
+    width: 650,
+    resizeMode: "contain",
   },
-  btnImg: {
-    width: 540,
-    height: 104,
-  },
+
   textStyle: {
     fontSize: 19,
     color: "white",

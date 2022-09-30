@@ -8,21 +8,35 @@ import {
   View,
   FlatList,
   SafeAreaView,
+  Dimensions,
+  useWindowDimensions,
 } from "react-native";
+import { WebView } from "react-native-webview";
+import RenderHtml from "react-native-render-html";
 
-const Item = ({ description, name, reportType }) => (
-  <View style={styles.item}>
-    <Text
-      style={[
-        styles.title,
-        { color: reportType === 1 ? "#EB1C24" : "#62DF90" },
-      ]}
-    >
-      {name}
-    </Text>
-    <Text style={styles.description}>{description}</Text>
-  </View>
-);
+const { width, height } = Dimensions.get("window");
+
+const Item = ({ description, name, reportType }) => {
+  return (
+    <View style={styles.item}>
+      <Text
+        style={[
+          styles.title,
+          { color: reportType === 1 ? "#EB1C24" : "#62DF90" },
+        ]}
+      >
+        {name}
+      </Text>
+      {/* <Text style={styles.description}>{description}</Text> */}
+      <RenderHtml
+        contentWidth={useWindowDimensions().width}
+        source={{
+          html: description,
+        }}
+      />
+    </View>
+  );
+};
 
 const HelpModal = ({
   modalVisible,
@@ -93,12 +107,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   title: {
-    fontSize: 19,
+    fontSize: height * 0.04,
     fontFamily: "mulish",
     color: "#EB1C24",
   },
   description: {
-    fontSize: 15,
+    fontSize: height * 0.03,
     fontFamily: "mulish",
     color: "#AAAEBF",
   },
@@ -142,6 +156,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     fontFamily: "mulish",
+    fontSize: height * 0.04,
   },
   modalText: {
     marginBottom: 15,
