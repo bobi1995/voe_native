@@ -60,7 +60,9 @@ const CameraModule = (props) => {
             <TouchableOpacity
               onPress={async () => {
                 if (cameraRef) {
-                  let photo = await cameraRef.takePictureAsync();
+                  let photo = await cameraRef.takePictureAsync({
+                    base64: true,
+                  });
                   props.setImage(photo);
                   props.setModalVisible();
                 }
@@ -191,7 +193,7 @@ export default function ImagePickerExample({ image, setImage }) {
           showModal={camera}
           setModalVisible={() => setShowCamera(false)}
           setImage={(result) => {
-            setImage(result.uri);
+            setImage(result);
           }}
         />
       )}

@@ -50,12 +50,6 @@ const GET_USER = gql`
     }
   }
 `;
-const getValue = async (key) => {
-  const result = await SecureStore.getItemAsync(key);
-  if (result) {
-    return result;
-  } else return null;
-};
 
 const priorityElement = (priority) => {
   const params = {
@@ -126,7 +120,11 @@ const EmpBoard = ({ navigation, route }) => {
     if (userData) {
       let votes = 0;
       let rating = 0;
+      let closed = 0;
       const tempData = userData.getSingleUser.regCaseIds.map((el) => {
+        if (el.status === 1) {
+          closed = closed + 1;
+        }
         if (el.rating && el.rating.length > 0) {
           el.rating.map((vote) => {
             const toObject = JSON.parse(vote);
@@ -136,11 +134,6 @@ const EmpBoard = ({ navigation, route }) => {
         }
 
         const categories = el.categoryId.map((cat) => cat.name);
-        if (el.answerId.length > 0) {
-          el.answerId.map((ans) =>
-            ans.approved ? setAnswers(answers + 1) : null
-          );
-        }
 
         return {
           priority: el.priority,
@@ -152,7 +145,7 @@ const EmpBoard = ({ navigation, route }) => {
           _id: el._id,
         };
       });
-
+      setAnswers(closed);
       setEmpRate(rating / votes);
       tempData.sort((a, b) => a.date < b.date);
 
@@ -337,7 +330,7 @@ const EmpBoard = ({ navigation, route }) => {
                 size={height * 0.025}
                 reviewSize={height * 0.025}
                 showRating={false}
-                //selectedColor="#3D4461"
+                isDisabled
                 starContainerStyle={{
                   alignSelf: "flex-start",
                 }}

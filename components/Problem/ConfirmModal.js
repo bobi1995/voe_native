@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Image,
   Modal,
@@ -15,10 +15,12 @@ import {
 import Signature from "react-native-signature-canvas";
 import { gql, useMutation } from "@apollo/client";
 import { AntDesign } from "@expo/vector-icons";
+import { ReactNativeFile } from "apollo-upload-client";
+
 const { width, height } = Dimensions.get("window");
 
 const SEND_CASE = gql`
-  mutation CreateCase($input: CreateCase!, $attachments: Upload) {
+  mutation CreateCase($input: CreateCase!, $attachments: [Upload]) {
     createCase(input: $input, attachments: $attachments) {
       _id
     }
@@ -34,14 +36,31 @@ const ConfirmModal = ({
   categoryId,
   navigate,
   reportType,
+  attachment,
 }) => {
   const ref = useRef();
   const [signature, setSign] = useState(null);
+  const [file, setFile] = useState(null);
 
   const [
     createCase,
     { data: caseData, loading: caseLoading, error: caseError },
   ] = useMutation(SEND_CASE);
+
+  useEffect(() => {
+    if (attachment) {
+      let localUri = attachment.uri;
+      let filename = localUri.split("/").pop();
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image`;
+      const picture = new ReactNativeFile({
+        uri: localUri,
+        name: `case.jpg`,
+        type: type,
+      });
+      setFile(picture);
+    }
+  }, [attachment]);
 
   const handleConfirm = () => {
     const temp = ref.current.readSignature();
@@ -60,6 +79,15 @@ const ConfirmModal = ({
     if (!signature) {
       return Alert.alert("Подпиши се");
     } else {
+      console.log({
+        description,
+        date: new Date().toDateString(),
+        priority,
+        userId,
+        categoryId,
+        signature,
+      });
+      console.log(file);
       createCase({
         variables: {
           input: {
@@ -71,6 +99,7 @@ const ConfirmModal = ({
             signature,
             type: reportType,
           },
+          attachments: [file],
         },
       });
       if (caseError) {
@@ -175,7 +204,10 @@ const ConfirmModal = ({
                   bottom: 10,
                 },
               ]}
-              onPress={() => navigate("Start")}
+              onPress={
+                () => navigate("Start")
+                //sendCase()
+              }
             >
               <Text style={styles.textStyle}>Затоври</Text>
             </Pressable>

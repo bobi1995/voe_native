@@ -11,7 +11,6 @@ import {
   Dimensions,
   useWindowDimensions,
 } from "react-native";
-import { WebView } from "react-native-webview";
 import RenderHtml from "react-native-render-html";
 
 const { width, height } = Dimensions.get("window");

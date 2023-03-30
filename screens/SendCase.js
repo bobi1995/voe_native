@@ -19,6 +19,8 @@ import { useState, useEffect } from "react";
 import Checkbox from "expo-checkbox";
 import ConfirmModal from "../components/Problem/ConfirmModal";
 import HelpModal from "../components/Problem/HelpModal";
+import Camera from "../components/Camera";
+import AttachedImage from "./SendCase/AttachedImage";
 const { width, height } = Dimensions.get("window");
 
 const GET_CATEGORIES = gql`
@@ -56,6 +58,7 @@ const SendCase = ({ navigation, route }) => {
   const [isChecked, setChecked] = useState(1);
   const [categories, setCategories] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [image, setImage] = useState(null);
   const [helpVisible, setHelpVisible] = useState(false);
   const { loading, error, data } = useQuery(GET_CATEGORIES);
   const [getUser, { loading: loadUser, error: errorUser, data: userData }] =
@@ -175,25 +178,6 @@ const SendCase = ({ navigation, route }) => {
         </View>
         <View style={styles.headerContainer}>
           <View style={styles.innerBodyContainer}>
-            <SafeAreaView>
-              <Text style={styles.label}>Описание на проблема</Text>
-
-              <TextInput
-                multiline={true}
-                style={{
-                  width: "99%",
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: "#AAAEBF",
-                  height: height * 0.4,
-                  textAlignVertical: "top",
-                  fontSize: height * 0.05,
-                }}
-                value={description}
-                onChangeText={setDescription}
-                placeholder="Опиши възникналият проблем..."
-              />
-            </SafeAreaView>
             <SafeAreaView
               style={{
                 flexDirection: "row",
@@ -250,6 +234,26 @@ const SendCase = ({ navigation, route }) => {
                 <TextInput style={styles.input} value={name} placeholder="" />
               </View>
             </SafeAreaView>
+            <SafeAreaView>
+              <Text style={styles.label}>Описание на проблема</Text>
+              <TextInput
+                multiline={true}
+                style={{
+                  width: "99%",
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: "#AAAEBF",
+                  height: height * 0.4,
+                  textAlignVertical: "top",
+                  fontSize: height * 0.05,
+                }}
+                value={description}
+                onChangeText={setDescription}
+                placeholder="Опиши възникналият проблем..."
+              />
+            </SafeAreaView>
+            {image ? <AttachedImage image={image} setImage={setImage} /> : null}
+            <Camera image={image} setImage={setImage} />
           </View>
           <View style={styles.innerBodyContainer}>
             <View>
@@ -362,6 +366,7 @@ const SendCase = ({ navigation, route }) => {
           categoryId={categories}
           priority={isChecked}
           navigate={navigation.navigate}
+          attachment={image}
           reportType={type}
         />
         <HelpModal
